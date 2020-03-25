@@ -1,6 +1,6 @@
 const d3 = require("d3");
 const topojson = require("topojson");
-
+import { parseDate } from "./data";
 class Map {
   width = window.innerWidth;
   height = window.innerHeight - 100;
@@ -25,12 +25,16 @@ class Map {
     this.panel = panel;
   }
 
+  setPlot(plot) {
+    this.plot = plot;
+  }
+
   setData({ allDates, dateToDataMap, confirmedWithIndices }) {
     this.allDates = allDates;
     this.dateToDataMap = dateToDataMap;
     this.curDateIdx = allDates.length - 1;
     this.confirmed = confirmedWithIndices;
-    this.renderForState(true, 2000,1000);
+    this.renderForState(true, 2000, 1000);
   }
 
   updateForDate(curDate) {
@@ -91,11 +95,11 @@ class Map {
       .enter()
       .append("path")
       .attr("d", this.path)
-      .style("opacity",0)
+      .style("opacity", 0)
       .transition()
       .ease(d3.easeCubicIn)
       .duration(1000)
-      .style("opacity",1);
+      .style("opacity", 1);
   }
 
   numWithCommas = x => {
@@ -200,7 +204,7 @@ class Map {
   };
 
   updateSlider() {
-    this.slider.update(this.slider.parseDate(this.allDates[this.curDateIdx]));
+    this.slider.update(parseDate(this.allDates[this.curDateIdx]));
   }
 
   applyPropsToNodes = nodes => {
@@ -218,10 +222,11 @@ class Map {
           .duration(500)
           .style("opacity", 0.9);
         self.tooltip
-          .html(self.getTooltipText(d))
+          // .html(self.getTooltipText(d))
           .style("display", "block")
           .style("left", d3.event.pageX + "px")
           .style("top", d3.event.pageY + "px");
+        self.plot.plot(d.id);
       })
       .on("mousemove", function() {
         self.tooltip
@@ -256,7 +261,7 @@ class Map {
     Deaths: <span class="red">${this.numWithCommas(d.deaths)}</span>
     `;
 
-  renderForState = (animated, duration = 250,delay=0) => {
+  renderForState = (animated, duration = 250, delay = 0) => {
     const currentData = this.dateToDataMap[this.curDateIdx];
     const updates = this.g.selectAll("circle").data(currentData, d => d.id);
 

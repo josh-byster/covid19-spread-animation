@@ -3,6 +3,7 @@ const dayjs = require("dayjs");
 import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 
+const parseDate = d3.timeParse("%m/%d/%y");
 const CONFIRMED_CASES_LINK =
   "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv";
 
@@ -46,11 +47,12 @@ const getAllTotalsForDate = (confirmed, deaths, recovered, date) => {
   const computedObj = {
     confirmed: getTotalCases(confirmed, date),
     deaths: getTotalCases(deaths, date),
-    recovered: getTotalCases(recovered, date),
+    recovered: getTotalCases(recovered, date)
   };
-  computedObj.active = computedObj.confirmed - computedObj.recovered - computedObj.deaths;
+  computedObj.active =
+    computedObj.confirmed - computedObj.recovered - computedObj.deaths;
   return computedObj;
-}
+};
 
 const processData = (confirmed, deaths, recovered) => {
   const confirmedWithIndices = addIndicesToData(confirmed);
@@ -69,8 +71,13 @@ const processData = (confirmed, deaths, recovered) => {
   const startDate = allDates[0];
   const endDate = allDates[allDates.length - 1];
   const totals = {};
-  for(let i = 0; i < allDates.length; i++){
-    totals[allDates[i]] = getAllTotalsForDate(confirmedWithIndices,deathsWithIndices,recoveredWithIndices,allDates[i]);
+  for (let i = 0; i < allDates.length; i++) {
+    totals[allDates[i]] = getAllTotalsForDate(
+      confirmedWithIndices,
+      deathsWithIndices,
+      recoveredWithIndices,
+      allDates[i]
+    );
   }
   return {
     allDates,
@@ -95,4 +102,4 @@ d3.json(LAST_REFRESH).then(data => {
   d3.select("#lastupdated").html(`Last update to dataset: ${lastUpdated}.`);
 });
 
-export { fetchData, fetchTopology, getTotalCases, kFormatter };
+export { fetchData, fetchTopology, getTotalCases, kFormatter, parseDate };
